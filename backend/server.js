@@ -14,9 +14,17 @@ app.use("/api/tasks", require("./routes/taskRoutes"));
 
 // DB Connect
 console.log("ENV:", process.env.MONGO_URI);
+
 mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("✅ DB Connected");
+  })
+  .catch((err) => {
+    console.log("❌ DB Error:", err.message);
+  });
 
 app.listen(8000, "0.0.0.0",() => console.log("Server running on port 6000"));
