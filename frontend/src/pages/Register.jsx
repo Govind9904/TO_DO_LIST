@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 export default function Register() {
   const [form, setForm] = useState({});
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const nav = useNavigate();
 
   const submit = async () => {
@@ -15,11 +16,14 @@ export default function Register() {
       return;
     }
 
+    setLoading(true);
     try {
       await API.post("/auth/register", form);
       nav("/");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -31,20 +35,25 @@ export default function Register() {
         <input
           placeholder="Name"
           onChange={(e) => setForm({ ...form, name: e.target.value })}
+          disabled={loading}
         />
 
         <input
           placeholder="Email"
           onChange={(e) => setForm({ ...form, email: e.target.value })}
+          disabled={loading}
         />
 
         <input
           type="password"
           placeholder="Password"
           onChange={(e) => setForm({ ...form, password: e.target.value })}
+          disabled={loading}
         />
 
-        <button onClick={submit}>Register</button>
+        <button onClick={submit} disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
 
         <div className="auth-link">
           Already have account? <span className="auth-action" onClick={() => nav("/")}>Login</span>

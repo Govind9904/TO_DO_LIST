@@ -9,14 +9,19 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editTask, setEditTask] = useState(null);
   const [filter, setFilter] = useState("all");
+  const [isFetching, setIsFetching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchTasks = async (currentFilter = filter) => {
+    setIsFetching(true);
     try {
       const params = currentFilter !== "all" ? { filter: currentFilter } : {};
       const res = await API.get("/tasks", { params });
       setTasks(res.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -27,6 +32,7 @@ export default function Dashboard() {
   const userName = localStorage.getItem("userName") || "User";
 
   const handleSave = async (title) => {
+    setIsSubmitting(true);
     try {
       if (editTask) {
         await API.put(`/tasks/${editTask._id}`, { title });
@@ -35,9 +41,11 @@ export default function Dashboard() {
       }
 
       setModalOpen(false);
-      fetchTasks();
+      await fetchTasks();
     } catch (err) {
       throw err;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -53,25 +61,35 @@ export default function Dashboard() {
     });
 
     if (result.isConfirmed) {
-      await API.delete(`/tasks/${id}`);
+      setIsSubmitting(true);
+      try {
+        await API.delete(`/tasks/${id}`);
 
-      Swal.fire({
-        title: "Deleted!",
-        text: "Your task has been deleted.",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your task has been deleted.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
 
-      fetchTasks();
+        await fetchTasks();
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   const toggleTask = async (task) => {
-    await API.put(`/tasks/${task._id}`, {
-      completed: !task.completed,
-    });
-    fetchTasks();
+    setIsSubmitting(true);
+    try {
+      await API.put(`/tasks/${task._id}`, {
+        completed: !task.completed,
+      });
+      await fetchTasks();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const logout = () => {
@@ -92,6 +110,7 @@ export default function Dashboard() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="custom-select"
+            disabled={isFetching || isSubmitting}
           >
             <option value="all">All</option>
             <option value="pending">Pending</option>
@@ -106,6 +125,7 @@ export default function Dashboard() {
               setEditTask(null);
               setModalOpen(true);
             }}
+            disabled={isSubmitting}
           >
             + New Task
           </button>
@@ -123,7 +143,12 @@ export default function Dashboard() {
 
       {/* TASK LIST */}
       <div className="task-list">
-        {tasks.length === 0 ? (
+        {isFetching ? (
+          <div className="loader-row">
+            <span className="loader-spinner" aria-hidden="true" />
+            <span>Loading tasks...</span>
+          </div>
+        ) : tasks.length === 0 ? (
           <p style={{ textAlign: "center", color: "#94a3b8" }}>No tasks yet</p>
         ) : (
           tasks.map((task) => (
@@ -136,6 +161,7 @@ export default function Dashboard() {
                 setModalOpen(true);
               }}
               onDelete={deleteTask}
+              disabled={isSubmitting}
             />
           ))
         )}
@@ -147,6 +173,7 @@ export default function Dashboard() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
         editTask={editTask}
+        loading={isSubmitting}
       />
     </div>
   );

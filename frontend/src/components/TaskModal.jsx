@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function TaskModal({ open, onClose, onSave, editTask }) {
+export default function TaskModal({ open, onClose, onSave, editTask, loading }) {
   const [title, setTitle] = useState("");
   const [error, setError] = useState("");
 
@@ -58,17 +58,18 @@ export default function TaskModal({ open, onClose, onSave, editTask }) {
             if (error) setError(""); // clear error on typing
           }}
           placeholder="Enter task..."
+          disabled={loading}
         />
 
         {/* error message */}
         {error && <p className="error-text">{error}</p>}
 
         <div className="modal-actions">
-          <button className="save-btn" onClick={handleSave}>
-            {editTask ? "Update" : "Add"}
+          <button className="save-btn" onClick={handleSave} disabled={loading}>
+            {loading ? "Please wait..." : editTask ? "Update" : "Add"}
           </button>
 
-          <button className="cancel-btn" onClick={onClose}>
+          <button className="cancel-btn" onClick={onClose} disabled={loading}>
             Cancel
           </button>
         </div>

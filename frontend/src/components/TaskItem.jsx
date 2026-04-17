@@ -1,4 +1,4 @@
-export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
+export default function TaskItem({ task, onToggle, onEdit, onDelete, disabled }) {
   return (
     <div className="task-item">
       <div className="task-left">
@@ -7,6 +7,7 @@ export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
           className="task-checkbox"
           checked={task.completed}
           onChange={() => onToggle(task)}
+          disabled={disabled}
         />
         <span className={`task-title ${task.completed ? "completed" : ""}`}>
           {task.title}
@@ -15,12 +16,16 @@ export default function TaskItem({ task, onToggle, onEdit, onDelete }) {
       <div className="task-actions">
         <button
           className="icon-btn"
-          disabled={task.completed}
+          disabled={task.completed || disabled}
           onClick={() => onEdit(task)}
         >
           Edit
         </button>
-        <button className="delete-btn" onClick={() => onDelete(task._id)}>
+        <button
+          className="delete-btn"
+          onClick={() => onDelete(task._id)}
+          disabled={disabled}
+        >
           Delete
         </button>
       </div>
