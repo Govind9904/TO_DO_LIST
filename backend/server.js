@@ -18,6 +18,17 @@ app.get("/", (req, res) => {
     message: "Backend is running 🚀",
   });
 });
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Backend is running",
+    database:
+      mongoose.connection.readyState === 1
+        ? "Connected"
+        : "Disconnected",
+  });
+});
 // DB Connect
 console.log("ENV:", process.env.MONGO_URI);
 
