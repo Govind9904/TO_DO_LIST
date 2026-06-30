@@ -2,6 +2,24 @@ const router = require("express").Router();
 const Task = require("../models/Task");
 const auth = require("../middleware/auth");
 
+
+router.get("/health", async (req, res) => {
+  try {
+    const count = await Task.countDocuments();
+
+    res.json({
+      success: true,
+      database: "Connected",
+      totalTasks: count,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      database: "Disconnected",
+    });
+  }
+});
+
 // Add Task
 router.post("/", auth, async (req, res) => {
   try {
