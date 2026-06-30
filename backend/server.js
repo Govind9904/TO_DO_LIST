@@ -12,6 +12,12 @@ app.use(express.json());
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
 
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Backend is running 🚀",
+  });
+});
 // DB Connect
 console.log("ENV:", process.env.MONGO_URI);
 
