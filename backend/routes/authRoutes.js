@@ -95,7 +95,10 @@ router.post("/login", async (req, res) => {
     return res.json({ token, name: user.name });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: err });
+    return res.status(500).json({ 
+      message: err.message,
+    stack: err.stack
+     });
   }
 });
 module.exports = router;
