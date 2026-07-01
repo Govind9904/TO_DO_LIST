@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
   try {
     let { email, password } = req.body;
 
-    email = email?.toLowerCase().trim();
+    email = email;
     password = password?.trim();
 
     // required validation
