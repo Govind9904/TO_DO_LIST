@@ -65,7 +65,7 @@ router.post("/", auth, async (req, res) => {
   }
 });
 // Get Tasks
-router.get("/task", auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const { filter } = req.query; // ?filter=completed / ?filter=pending
     const query = { userId: req.user.id };
